@@ -1,0 +1,71 @@
+# Task 3 - Combat Online Plagiarism with AI
+# Plagiarism Detection using TF-IDF and Cosine Similarity
+
+import re
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+
+# Text normalization
+def normalize_text(text):
+    text = text.lower()
+    text = re.sub(r'[^a-zA-Z0-9\s]', '', text)
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
+
+
+# Calculate similarity
+def check_plagiarism(text1, text2):
+
+    text1 = normalize_text(text1)
+    text2 = normalize_text(text2)
+
+    documents = [text1, text2]
+
+    vectorizer = TfidfVectorizer(ngram_range=(1, 2))
+    tfidf_matrix = vectorizer.fit_transform(documents)
+
+    similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])
+
+    score = similarity[0][0] * 100
+
+    return score
+
+
+# Source texts
+source1 = """
+Artificial intelligence is a branch of computer science
+that focuses on creating machines that can perform tasks
+that normally require human intelligence.
+"""
+
+source2 = """
+Artificial intelligence is a field of computer science
+that focuses on developing machines capable of performing
+tasks that usually require human intelligence.
+"""
+
+
+# Check plagiarism
+score = check_plagiarism(source1, source2)
+
+
+print("====================================")
+print("       AI PLAGIARISM CHECKER")
+print("====================================")
+
+print("\nSimilarity Score:", round(score, 2), "%")
+
+
+# Threshold
+if score >= 70:
+    print("Result: HIGH SIMILARITY")
+    print("Possible plagiarism detected.")
+elif score >= 40:
+    print("Result: MODERATE SIMILARITY")
+    print("Some similar content detected.")
+else:
+    print("Result: LOW SIMILARITY")
+    print("No significant plagiarism detected.")
+
+print("====================================")
